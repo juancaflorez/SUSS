@@ -5,7 +5,7 @@
 #include "SussDummyProviders.h"
 #include "SussSettings.h"
 #include "Engine/ObjectLibrary.h"
-#include "..\Public\Inputs\SussPerceptionInputProviders.h"
+#include "../Public/Inputs/SussPerceptionInputProviders.h"
 #include "Actions/SussAbilityActions.h"
 #include "Inputs/SussAbilityInputProviders.h"
 #include "Inputs/SussBlackboardInputProviders.h"

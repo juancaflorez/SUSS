@@ -2,7 +2,7 @@
 
 #include "SUSS.h"
 
-#include "Debug\GameplayDebuggerCategorySUSS.h"
+#include "Debug/GameplayDebuggerCategorySUSS.h"
 #include "GameplayDebugger.h"
 #if WITH_EDITOR
 #include "ISettingsModule.h"
