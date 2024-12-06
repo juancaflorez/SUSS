@@ -9,7 +9,7 @@ UE_DISABLE_OPTIMIZATION
 
 BEGIN_DEFINE_SPEC(FSussBrainTestContextsSpec,
 				  "SUSS: Test  Contexts",
-				  EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter);
+				  EAutomationTestFlags::EditorContext | EAutomationTestFlags::ProductFilter);
 
 	TUniquePtr<FSussTestWorldFixture> WorldFixture;
 
