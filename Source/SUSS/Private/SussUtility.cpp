@@ -8,9 +8,21 @@
 #include "AIController.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "NavFilters/NavigationQueryFilter.h"
+#include "Perception/AISense_Damage.h"
+#include "Perception/AISense_Hearing.h"
+#include "Perception/AISense_Sight.h"
+#include "Perception/AISense_Team.h"
+#include "Perception/AISense_Touch.h"
 #include "Queries/SussEQSWorldSubsystem.h"
 #include "Queries/SussPerceptionQueries.h"
 
+static const FName SussQuerySenseParam("Sense");
+static const FName SussQuerySenseSightValue("Sight");
+static const FName SussQuerySenseHearingValue("Hearing");
+static const FName SussQuerySenseDamageValue("Damage");
+static const FName SussQuerySenseTouchValue("Touch");
+static const FName SussQuerySenseTeamValue("Team");
+static const FName SussQueryIgnoreTagsParam("IgnoreTags");
 
 bool USussUtility::IsActionEnabled(FGameplayTag ActionTag)
 {
@@ -700,16 +712,17 @@ float USussUtility::EvalCurve(ESussCurveType CurveType, float Input, const FVect
 	return 0;
 }
 
-float USussUtility::GetPathDistanceTo(AAIController* Agent, const FVector& Location)
+float USussUtility::GetPathDistanceTo(AAIController* Agent, const FVector& Location, bool bAllowPartialPaths)
 {
 	if (Agent && Agent->GetPawn())
 	{
-		return GetPathDistanceFromTo(Agent, Agent->GetPawn()->GetActorLocation(), Location);
+		return GetPathDistanceFromTo(Agent, Agent->GetPawn()->GetActorLocation(), Location, false);
 	}
 	return BIG_NUMBER;
 }
 
-float USussUtility::GetPathDistanceFromTo(AAIController* Agent, const FVector& FromLocation, const FVector& ToLocation)
+float USussUtility::GetPathDistanceFromTo(AAIController* Agent, const FVector& FromLocation, const FVector& ToLocation, bool
+                                          bAllowPartialPath)
 {
 	if (!Agent)
 	{
@@ -732,7 +745,7 @@ float USussUtility::GetPathDistanceFromTo(AAIController* Agent, const FVector& F
 		{
 			FSharedConstNavQueryFilter NavFilter = UNavigationQueryFilter::GetQueryFilter(*NavData, Agent->GetDefaultNavigationFilterClass());
 			FPathFindingQuery Query(Agent, *NavData, FromLocation, ToLocation, NavFilter);
-			Query.SetAllowPartialPaths(false);
+			Query.SetAllowPartialPaths(bAllowPartialPath);
 			auto Result = NavSys->FindPathSync(Query);
 
 			if (Result.IsSuccessful())
@@ -768,4 +781,46 @@ const FSussActorPerceptionInfo& USussUtility::GetPerceptionInfoFromContext(const
 	bSuccess = false;
 	static FSussActorPerceptionInfo Dummy;
 	return Dummy;
+}
+
+TSubclassOf<UAISense> USussUtility::GetSenseClassFromParams(
+	const TMap<FName, FSussParameter>& Params)
+{
+	if (auto pSense = Params.Find(SussQuerySenseParam))
+	{
+		if (*pSense == SussQuerySenseSightValue)
+		{
+			return UAISense_Sight::StaticClass();
+		}
+		else if (*pSense == SussQuerySenseHearingValue)
+		{
+			return UAISense_Hearing::StaticClass();
+		}
+		else if (*pSense == SussQuerySenseDamageValue)
+		{
+			return UAISense_Damage::StaticClass();
+		}
+		else if (*pSense == SussQuerySenseTouchValue)
+		{
+			return UAISense_Touch::StaticClass();
+		}
+		else if (*pSense == SussQuerySenseTeamValue)
+		{
+			return UAISense_Team::StaticClass();
+		}
+	}
+
+	return nullptr;
+}
+
+void USussUtility::GetIgnoreTagsFromParams(const TMap<FName, FSussParameter>& Params,
+	FGameplayTagContainer& OutTags)
+{
+	if (auto pTagContainer = Params.Find(SussQueryIgnoreTagsParam))
+	{
+		if (pTagContainer->Type == ESussParamType::TagContainer)
+		{
+			OutTags.AppendTags(pTagContainer->TagContainer);
+		}
+	}
 }

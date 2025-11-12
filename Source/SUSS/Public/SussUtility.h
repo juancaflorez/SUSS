@@ -255,21 +255,24 @@ public:
 	/**
 	 * Get the distance along navmesh paths from an actor's current location to a desired location.
 	 * @param Agent The actor in question
-	 * @param Location The desired location 
+	 * @param Location The desired location
+	 * @param bAllowPartialPaths Whether to allow partial paths
 	 * @return Distance, or BIG_NUMBER if unreachable
 	 */
 	UFUNCTION(BlueprintCallable, Category="SUSS")
-	static float GetPathDistanceTo(AAIController* Agent, const FVector& Location);
+	static float GetPathDistanceTo(AAIController* Agent, const FVector& Location, bool bAllowPartialPaths = false);
 
 	/**
 	 * Get the distance along navmesh paths between 2 locations, for an actor.
 	 * @param Agent The actor in question
 	 * @param FromLocation The location to measure from
-	 * @param ToLocation The desired location 
+	 * @param ToLocation The desired location
+	 * @param bAllowPartialPath Whether to allow partial paths
 	 * @return Distance, or BIG_NUMBER if unreachable
 	 */
 	UFUNCTION(BlueprintCallable, Category="SUSS")
-	static float GetPathDistanceFromTo(AAIController* Agent, const FVector& FromLocation, const FVector& ToLocation);
+	static float GetPathDistanceFromTo(AAIController* Agent, const FVector& FromLocation, const FVector& ToLocation, bool
+	                                   bAllowPartialPath = false);
 
 	UFUNCTION(Blueprintable, Category="SUSS")
 	static ECollisionChannel GetLineOfSightTraceChannel();
@@ -277,4 +280,12 @@ public:
 	/// Helper function to retrieve the "PerceptionInfo" named struct from a context
 	UFUNCTION(BlueprintCallable, Category="SUSS")
 	static const FSussActorPerceptionInfo& GetPerceptionInfoFromContext(const FSussContext& Context, bool& bSuccess);
+
+	/// Retrieve a sense class specified in parameters
+	UFUNCTION(BlueprintCallable, Category="SUSS")
+	static TSubclassOf<UAISense> GetSenseClassFromParams(const TMap<FName, FSussParameter>& Params);
+
+	/// Retrieve ignore tags from parameters ("IgnoreTags" 
+	UFUNCTION(BlueprintCallable, Category="SUSS")
+	static void GetIgnoreTagsFromParams(const TMap<FName, FSussParameter>& Params, FGameplayTagContainer& OutTags);
 };
